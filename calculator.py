@@ -9,6 +9,11 @@ operations = {
     '/': lambda a, b: a // b,
     '^': lambda a, b: a ** b,
 }
+UNKNOWN = 'Unknown Variable'
+INVALID_ASSIGN = 'Invalid assignment'
+INVALID_EX = 'Invalid Expression'
+INVALID_ID = 'Invalid identifier'
+RIGHT_EX = 'Right Expression'
 
 
 def name_validator(name):
@@ -50,10 +55,10 @@ def variable_substitute(expression):
         if expression[x].isalpha() and expression[x] in variable:
             expression[x] = str(variable[expression[x]])
         elif expression[x].isalpha() and expression[x] not in variable:
-            return 'Unknown Variable'
+            return UNKNOWN
         elif (not expression[x].isalpha()) and (not expression[x].isdigit()) and (
                 expression[x] not in {'+', '*', '-', '/', '^', '(', ')'}):
-            return 'Invalid assignment'
+            return INVALID_ASSIGN
     return expression
 
 
@@ -127,48 +132,44 @@ def expression_validator(expression, mode='simple'):
             try:
                 brackets.pop()
             except IndexError:
-                return 'Invalid Expression'
+                return INVALID_EX
     if len(brackets) != 0 or expression[-1] in {'+', '-', '*', '/', '^', '='}:
-        return 'Invalid expression'
+        return INVALID_EX
     if expression.find('=') != -1:
         return 'Affectation'
     find = [expression.find(x) for x in operations]
     if find == [-1 for _ in range(4)]:
         if expression.find(' ') != -1:
-            return 'Invalid Expression'
+            return INVALID_EX
         elif expression.find(' ') == -1:
             if mode != 'affectation':
                 if expression.isdigit():
-                    return 'Right Expression'
+                    return RIGHT_EX
                 elif expression.isalpha():
-                    if expression in variable:
-                        return 'Right Expression'
-                    else:
-                        return 'Unknown Variable'
+                    return RIGHT_EX if expression in variable else UNKNOWN
                 elif not expression.isalpha() and not expression.isdigit():
-                    return 'Invalid identifier'
+                    return INVALID_ID
 
-    return 'Right Expression'
+    return RIGHT_EX
 
 
 def variable_add(expression):
     if expression.count('=') > 1:
-        print('Invalid assignment')
+        print(INVALID_ASSIGN)
         return
     a = expression.replace(' ', '').split('=')
     if not name_validator(a[0]):
-        print('Invalid identifier')
+        print(INVALID_ID)
         return
-    elif expression_validator(a[1], 'affectation') in ['Invalid Expression', 'Invalid identifier']:
-        print('Invalid assignment')
+    elif expression_validator(a[1], 'affectation') in [INVALID_EX, INVALID_ID]:
+        print(INVALID_ASSIGN)
         return
-    elif expression_validator(a[1], 'affectation') == 'Unknown Variable':
-        print('Unknown Variable')
+    elif expression_validator(a[1], 'affectation') == UNKNOWN:
+        print(UNKNOWN)
         return
     variable[a[0]] = infix_to_posfix(infix_dissociator(a[1]))
-    if variable[a[0]] in ['Unknown Variable', 'Invalid assignment']:
+    if variable[a[0]] in [UNKNOWN, INVALID_ASSIGN]:
         print(variable[a[0]])
-        return
     else:
         variable[a[0]] = posfix_o_answer(variable[a[0]])
 
@@ -193,7 +194,7 @@ def infix_to_posfix(infix):
     op_stack = deque()
     posfix = []
     infix = variable_substitute(infix)
-    if infix in ['Unknown Variable', 'Invalid assignment']:
+    if infix in [UNKNOWN, INVALID_ASSIGN]:
         return infix
     for x in infix:
         if x.isdigit():
@@ -253,7 +254,7 @@ def posfix_o_answer(expression):
 
 def main():
     while 1:
-        expression = ''.join(input().split(' '))
+        expression = ''.join(input("Veuillez saisir votre expression: ").split(' '))
         if len(expression) != 0:
             if expression[0] == '/':
                 if expression == '/exit':
@@ -261,18 +262,17 @@ def main():
                     break
                 elif expression == '/help':
                     print("The program evaluates the given expression and returns the result")
-                    continue
                 else:
                     print('Unknown command')
             elif expression_validator(expression) == 'Affectation':
                 variable_add(expression)
-            elif expression_validator(expression) != 'Right Expression':
+            elif expression_validator(expression) != RIGHT_EX:
                 print(expression_validator(expression))
             else:
                 answer = infix_dissociator(expression)
                 if answer != 'Unknown':
                     answer = infix_to_posfix(answer)
-                    if answer in ['Unknown Variable', 'Invalid assignment']:
+                    if answer in [UNKNOWN, INVALID_ASSIGN]:
                         print(answer)
                     else:
                         print(posfix_o_answer(answer))
