@@ -255,13 +255,20 @@ def posfix_o_answer(expression):
 def main():
     while 1:
         expression = ''.join(input("Veuillez saisir votre expression: ").split(' '))
-        if len(expression) != 0:
+        if expression != "":
             if expression[0] == '/':
                 if expression == '/exit':
                     print('Bye!')
                     break
                 elif expression == '/help':
-                    print("The program evaluates the given expression and returns the result")
+                    print("""Le programme évalue des expressions données puis renvoie un résultat.
+Vous pouviez y ajouter des variables et affecter des valeurs à ces variables
+Exemple:
+> a = 2
+> b = 3
+> a + b
+5
+                    """)
                 else:
                     print('Unknown command')
             elif expression_validator(expression) == 'Affectation':
