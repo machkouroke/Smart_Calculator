@@ -1,6 +1,6 @@
 Smart_Calulator
 ============
-![image](https://user-images.githubusercontent.com/40785379/177902471-098b5a32-9600-4b27-a6d3-68d889a007b2.png)
+![image](https://user-images.githubusercontent.com/40785379/177902861-6ed4cbb9-a0c8-4abc-984c-157db57089d6.png)
 
 Calculatrice intélligente évaluant un ensemble d'expression <br>
 ===========
